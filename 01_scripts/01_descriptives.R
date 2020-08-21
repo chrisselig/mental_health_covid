@@ -25,13 +25,14 @@ descriptive_plot_function <- function(data = descriptive_tidy ,
     plot <- data %>% 
         filter(metric == !!metric) %>% 
         ggplot(aes(x = period, y = value, fill = response)) + 
-        geom_bar(stat="identity") + 
+        geom_bar(stat="identity",width = 0.5) + 
         # facet_grid(.~metric) +
         coord_flip() +
         labs(
             y = '',
             x = xlab
         ) +
+        # scale_y_discrete(expand = C (0,5)) +
         theme_minimal() +
         scale_fill_brewer(palette = "Greys") +
         theme(
@@ -54,11 +55,11 @@ descriptive_plot_function <- function(data = descriptive_tidy ,
 
 
 # Create final plot ----
-p1 <- descriptive_plot_function(data = data, metric = 'SRMH', xlab = 'SRMH Responses')
-p2 <- descriptive_plot_function(data = data, metric = 'Financial impact', xlab = 'Financial Impact Responses')
-p3 <- descriptive_plot_function(data = data, metric = 'Job security', xlab = 'Job Security Responses')
+p1 <- descriptive_plot_function(data = data, metric = 'SRMH', xlab = 'SRMH')
+p2 <- descriptive_plot_function(data = data, metric = 'Financial impact', xlab = 'Financial Impact')
+p3 <- descriptive_plot_function(data = data, metric = 'Job security', xlab = 'Job Security')
 
 combined_descriptive <- cowplot::plot_grid(p1, p3, p2 + remove("x.text"), 
-                   ncol = 2, nrow =2)
+                   ncol = 1, nrow =3)
 
-ggsave('02_images/descriptive_combined.png', combined_descriptive, dpi = 600, height=7, width = 8)
+ggsave('02_images/descriptive_combined.png', combined_descriptive, dpi = 300, height=7, width = 8)

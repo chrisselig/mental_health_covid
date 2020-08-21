@@ -3,7 +3,7 @@ library(tidyverse) # data manipulation, plotting, and pipe operator ( %>% )
 library(ggthemes) # for the Edward Tufte theme
 library(readxl) # read excel files
 library(janitor) # clean column names quickly
-library(RColorBrewer) # color palette
+library(cowplot) # arranging plots into a single plot
 
 # Load data ----
 prediction_raw <- readxl::read_xlsx('00_data/Predicted values of mental health by econ concerns.xlsx')
@@ -11,70 +11,60 @@ prediction_raw <- readxl::read_xlsx('00_data/Predicted values of mental health b
 # Tidy the data ----
 prediction_tidy <- prediction_raw %>% 
     # clean column names
-    janitor::clean_names() %>% 
-    # unpivot to long format for plotting
-    pivot_longer(
-        cols = predicted_probability:ci_high
-    )
+    janitor::clean_names() 
 
-prediction_tidy_long <- prediction_raw %>% 
-    # clean column names
-    janitor::clean_names() %>% 
-    # unpivot to long format for plotting
-    pivot_longer(
-        cols = predicted_probability:ci_high
-    )
-
-# Plotting ----
-# prediction_tidy %>% 
-#     filter(metric == "Predicted 'bad' mental health") %>% 
-#     filter()
-#     ggplot() +
-#     geom_segment(
-#         stat = 'identity',
-#         aes(x = ci_low , xend = predicted_probability, y = 0, yend = 0)
-#     ) +
-#     geom_segment(
-#         stat = 'identity',
-#         aes(x = predicted_probability , xend = ci_high, y = 0, yend = 0)
-#     ) +
-#     geom_point(data = prediction_tidy_long %>% filter(metric == "Predicted 'bad' mental health"),
-#                 aes(x =value, y = 0, color = name)
-#                                                       
-#     ) +
-#     scale_x_comma(position = "top", limits = c(0.4, 0.7)) +
-#     # scale_color_ipsum(name = "A real legend title") +
-#     labs(
-#         x = "Description of the value", y = NULL,
-#         title = "A good plot title"
-#     ) +
-#     theme_ipsum_rc(grid = "X") +
-#     theme(legend.position = "bottom")
-
+# Define plotting function ----
+pred_probability_function <- function(data = prediction_tidy,
+                                      metric, 
+                                      # economic_variable, 
+                                      ylab){
+    
+    data %>% 
+        
+        # Filter on chosen metric... !! just tells ggplot to evaluate in function, not earlier
+        filter(metric == !!metric) %>% 
+        
+        # filter(economic_variable == !!economic_variable) %>% 
+        ggplot() +
+        # Geometries
+        # geom_errorbarh(aes(xmin = ci_low, xmax = ci_high, y = response),height=0.2, size=1, color="grey") +
+        
+        # Add horizontal line for low/high confidence interval
+        geom_linerange(aes(xmin = ci_low, xmax = ci_high, y = response), size=1, color="grey") +
+        
+        # Add point for predicted probability
+        geom_point(aes(x=predicted_probability, y=response), size=2, color = 'black') +
+        
+        # Trellis/show group by economic variable
+        facet_wrap(~economic_variable, nrow = 3,strip.position = "right", scales='free_y') +
+        
+        # Change labels
+        labs(
+            y = ylab,
+            x = ''
+        ) +
+        # Change theme
+        theme_minimal() +
+        theme(
+            panel.grid = element_blank()
+        ) 
+}
 
 
-financial <- prediction_tidy_long %>% 
-    filter(metric == "Predicted 'bad' mental health") %>% 
-    filter(economic_variable =='Financial impact') %>% 
-    ggplot() +
+# Function Testing ----
+# data <- prediction_tidy
+# metric <- "Predicted 'bad' mental health"
+# 
+# pred_probability_function(data = prediction_tidy,metric = metric, ylab = 'test')
 
-    geom_point(aes(x=response, y=value,color = name), size=2) +
-    coord_flip() +
 
-    # facet_wrap(~economic_variable) +
-    theme_tufte() +
-    labs(
-        x = NULL,
-        y = NULL,
-        title = "Financial Impact",
-        subtitle = ''
-    ) +
-    theme(
-        # change lineheight of title/subtitles
-        plot.title = element_markdown(lineheight = 1.1),
-        plot.subtitle = element_markdown(lineheight = 1.1)
-        # remove legend
-        # legend.position = "none"
-    )
+# Create final plot ----
+p1 <- pred_probability_function(data = data, metric = "Predicted 'bad' mental health", ylab = "Predicted 'bad' mental health")
+p2 <- pred_probability_function(data = data, metric = "Predicted elevated anxiety", ylab = "Predicted elevated anxiety")
 
-ggsave('02_images/predicted_probability_financial_impact.png',financial, dpi = 600, height = 3, width = 5)    
+# combine plots
+combined_predictive_prob <- cowplot::plot_grid(p1,p2, 
+                                           ncol = 1, nrow =2)
+
+# Save plot
+ggsave('02_images/predicted_prob_combined.png', combined_predictive_prob, dpi = 300, height=7, width = 8)
