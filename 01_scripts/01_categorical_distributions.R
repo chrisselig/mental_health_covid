@@ -42,28 +42,29 @@ colors = c('#4F2683','#807F83')
 ggsave('02_images/distribution_joblose.png',distribution_joblose,dpi = 600, height = 3, width =4)
 
 
-raw_data_labels %>% 
-    select(srmh, joblose,w) %>% 
-    filter(joblose != 'Valid skip') %>% 
-    group_by(w,srmh, joblose) %>% 
-    summarize(count = n()) %>% 
-    treemap(
-        index = c('w','srmh','joblose'),
-        vSize = 'count',
-        n = 3,
-        fontsize.labels=c(15,12),                # size of labels. Give the size per level of aggregation: size for group, size for subgroup, sub-subgroups...
-        fontcolor.labels=c("white","orange",'black'),    # Color of labels
-        fontface.labels=c(2,1),                  # Font of labels: 1,2,3,4 for normal, bold, italic, bold-italic...
-        bg.labels=c("transparent"),              # Background color of labels
-        align.labels=list(
-            c("center", "center"), 
-            c("right", "bottom")
-        ),                                   # Where to place labels in the rectangle?
-        overlap.labels=0.5,                      # number between 0 and 1 that determines the tolerance of the overlap between labels. 0 means that labels of lower levels are not printed if higher level labels overlap, 1  means that labels are always printed. In-between values, for instance the default value .5, means that lower level labels are printed if other labels do not overlap with more than .5  times their area size.
-        inflate.labels=F,                      # If true, labels are bigger when rectangle is bigger.
-        title = 'Job Loss Responses',
-        palette = 'Set1'
-    )
+# Alternate version of tree map
+# raw_data_labels %>% 
+#     select(srmh, joblose,w) %>% 
+#     filter(joblose != 'Valid skip') %>% 
+#     group_by(w,srmh, joblose) %>% 
+#     summarize(count = n()) %>% 
+#     treemap(
+#         index = c('w','srmh','joblose'),
+#         vSize = 'count',
+#         n = 3,
+#         fontsize.labels=c(15,12),                # size of labels. Give the size per level of aggregation: size for group, size for subgroup, sub-subgroups...
+#         fontcolor.labels=c("white","orange",'black'),    # Color of labels
+#         fontface.labels=c(2,1),                  # Font of labels: 1,2,3,4 for normal, bold, italic, bold-italic...
+#         bg.labels=c("transparent"),              # Background color of labels
+#         align.labels=list(
+#             c("center", "center"), 
+#             c("right", "bottom")
+#         ),                                   # Where to place labels in the rectangle?
+#         overlap.labels=0.5,                      # number between 0 and 1 that determines the tolerance of the overlap between labels. 0 means that labels of lower levels are not printed if higher level labels overlap, 1  means that labels are always printed. In-between values, for instance the default value .5, means that lower level labels are printed if other labels do not overlap with more than .5  times their area size.
+#         inflate.labels=F,                      # If true, labels are bigger when rectangle is bigger.
+#         title = 'Job Loss Responses',
+#         palette = 'Set1'
+#     )
 
 
 
@@ -96,3 +97,31 @@ treemap_joblose <- raw_data_labels %>%
     )
 
 ggsave('02_images/distribution_joblose.png',treemap_joblose,dpi = 600, height = 4, width =5)
+
+
+x <- raw_data_labels %>% 
+    select(srmh, joblose,w) %>% 
+    filter(joblose != 'Valid skip') %>% 
+    group_by(w,srmh, joblose) %>% 
+    summarize(count = n()) %>% 
+    ggplot(aes(x = w, y = count, fill = joblose)) + 
+    geom_bar(stat="identity") + 
+    facet_grid(.~srmh) +
+    labs(
+        title = "SRMH Distribution for Job Loss", 
+        subtitle = "Displayed by <b style='color:#4F2683'>Might Lose </b>and <b style='color:#807F83'>Not Expected</b>",
+        x = '',
+        y = ''
+    ) +
+    theme_tufte() +
+    scale_fill_manual(values =colors) +
+    theme(
+        # change lineheight of title/subtitles
+        plot.title = element_markdown(lineheight = 1.1),
+        plot.subtitle = element_markdown(lineheight = 1.1),
+        # remove legend
+        legend.position = "none"
+    )
+    # theme(axis.text.x = element_text(angle = 90, size = 8))
+
+ggsave('02_images/distribution_joblose_bar.png',x,dpi = 600, height = 4, width =5)
