@@ -44,7 +44,9 @@ descriptive_plot_function <- function(data = descriptive_tidy ,
         coord_flip() +
         labs(
             y = '',
-            x = xlab
+            x = xlab#,           # comment this line for horizontal labels
+            # x = '',           # uncomment this line for horizontal labels
+            # subtitle = xlab   # uncomment this line for horizontal labels
         ) +
         theme_minimal() +
         
@@ -66,7 +68,7 @@ descriptive_plot_function <- function(data = descriptive_tidy ,
 # Testing function ----
 # data <- descriptive_tidy
 # metric <- 'Job security'
-# xlab <- 'SRMH Responses'
+# xlab <- 'SRMH'
 # 
 # descriptive_plot_function(data = data, metric = metric, xlab = xlab)
 

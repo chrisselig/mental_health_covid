@@ -42,8 +42,10 @@ pred_probability_function <- function(data = prediction_tidy,
         
         # Change labels
         labs(
-            y = ylab,
-            x = ''
+            y = ylab,           # comment this line for horizontal labels
+            x = ''#,
+            # y = '',           # uncomment this line for horizontal labels
+            # subtitle = ylab   # uncomment this line for horizontal labels
         ) +
         # Change theme
         theme_minimal() +
