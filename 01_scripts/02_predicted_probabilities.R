@@ -5,6 +5,7 @@ library(readxl) # read excel files
 library(janitor) # clean column names quickly
 library(cowplot) # arranging plots into a single plot
 
+
 # Load data ----
 prediction_raw <- readxl::read_xlsx('00_data/Predicted values of mental health by econ concerns.xlsx')
 
@@ -13,6 +14,7 @@ prediction_tidy <- prediction_raw %>%
     # clean column names
     janitor::clean_names() %>% 
     mutate(
+        # Turn variable into factor and set order they will appear in plot
         economic_variable = factor(economic_variable, levels = c('Job security','Financial impact','Food security'))
     )
 
@@ -50,7 +52,9 @@ pred_probability_function <- function(data = prediction_tidy,
         # Change theme
         theme_minimal() +
         theme(
+            # Turn off grid
             panel.grid = element_blank(),
+            # Change text size of all elements
             text = element_text(size = 14)#,
             #strip.text.y.right = element_text(angle=0)   # Rotate right hand side y-axis labels
         ) 
@@ -68,7 +72,7 @@ pred_probability_function <- function(data = prediction_tidy,
 p1 <- pred_probability_function(data = prediction_tidy, metric = "Predicted 'bad' mental health", ylab = "Predicted 'bad' mental health")
 p2 <- pred_probability_function(data = prediction_tidy, metric = "Predicted elevated anxiety", ylab = "Predicted elevated anxiety")
 
-# combine plots
+# # Arrange plots into single column
 combined_predictive_prob <- cowplot::plot_grid(p1,p2, 
                                            ncol = 1, nrow =2)
 

@@ -10,6 +10,7 @@ library(forcats) # Rearranging variables to proper order
 raw_data_descriptive <- readxl::read_xlsx('00_data/Descriptives for 3 variables.xlsx')
 
 # Define color palette ----
+# Create a color table so colors can be assigned to each variable consistently 
 color_table <- tibble(
     response = c('Excellent','Very good','Good','Fair','Poor','No impact','Too soon to tell','Minor',
                  'Moderate','Major','Not expecting to lose job','Might lose job','Not employed' 
@@ -19,13 +20,16 @@ color_table <- tibble(
 
 # Unpivot data so W1 and W2 columns are stacked on top of each other
 descriptive_tidy <- raw_data_descriptive %>% 
+    # Rename column headers
     rename(March = w1,
            May = w2
     ) %>% 
+    # Turn dataframe from wide to long (unpivot)
     pivot_longer(
         cols = March:May,
         names_to='period'
     ) %>% 
+    # Turn to factor and set levels so they appear properly in visuals
     mutate(
         response = factor(response, levels = color_table$response)
     )
@@ -40,7 +44,11 @@ descriptive_plot_function <- function(data = descriptive_tidy ,
         filter(metric == !!metric) %>%
         # arrange(value) %>% 
         ggplot(aes(x = fct_rev(period), y = value, fill = response)) + 
+        
+        # Geometries
         geom_bar(stat="identity") + 
+        
+        # Formatting
         coord_flip() +
         labs(
             y = '',
@@ -79,6 +87,7 @@ p1 <- descriptive_plot_function(data = descriptive_tidy, metric = 'SRMH', xlab =
 p2 <- descriptive_plot_function(data = descriptive_tidy, metric = 'Financial impact', xlab = 'Financial Impact')
 p3 <- descriptive_plot_function(data = descriptive_tidy,metric = 'Job security', xlab = 'Job Security')
 
+# Arrange plots into single column
 combined_descriptive <- cowplot::plot_grid(p1, p3, p2, 
                    ncol = 1, nrow =3)
 
