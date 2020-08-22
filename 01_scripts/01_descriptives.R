@@ -1,6 +1,5 @@
 # library(tidypredict)
 library(tidyverse) # data manipulation, plotting, and pipe operator ( %>% )
-library(ggthemes) # for the Edward Tufte theme
 library(readxl)
 library(RColorBrewer) # color palette
 library(cowplot) # arranging plots into a single plot

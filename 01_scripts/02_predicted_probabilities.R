@@ -1,6 +1,5 @@
 # Load libraries ----
 library(tidyverse) # data manipulation, plotting, and pipe operator ( %>% )
-library(ggthemes) # for the Edward Tufte theme
 library(readxl) # read excel files
 library(janitor) # clean column names quickly
 library(cowplot) # arranging plots into a single plot
