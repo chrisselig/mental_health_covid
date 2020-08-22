@@ -7,6 +7,7 @@ library(cowplot) # arranging plots into a single plot
 
 # Load data ----
 prediction_raw <- readxl::read_xlsx('00_data/Predicted values of mental health by econ concerns.xlsx')
+# prediction_raw <- readxl::read_xlsx('00_data/tidied_data_via_code/predicted_probabilities_tidy.xlsx')
 
 # Tidy the data ----
 prediction_tidy <- prediction_raw %>% 
