@@ -44,14 +44,15 @@ pred_probability_function <- function(data = prediction_tidy,
         labs(
             y = ylab,           # comment this line for horizontal labels
             x = ''#,
-            # y = '',           # uncomment this line for horizontal labels
-            # subtitle = ylab   # uncomment this line for horizontal labels
+            #y = '',           # uncomment this line for horizontal labels
+            #subtitle = ylab   # uncomment this line for horizontal labels
         ) +
         # Change theme
         theme_minimal() +
         theme(
             panel.grid = element_blank(),
-            text = element_text(size = 14)
+            text = element_text(size = 14)#,
+            #strip.text.y.right = element_text(angle=0)   # Rotate right hand side y-axis labels
         ) 
 }
 
@@ -72,4 +73,4 @@ combined_predictive_prob <- cowplot::plot_grid(p1,p2,
                                            ncol = 1, nrow =2)
 
 # Save plot
-ggsave('02_images/predicted_prob_combined.png', combined_predictive_prob, dpi = 300, height=8, width = 8)
+ggsave('02_images/predicted_prob_combined.png', combined_predictive_prob, dpi = 300, height=8.5, width = 8)
