@@ -4,7 +4,8 @@ pkgs <- c(
     'readxl',  # read excel files
     'RColorBrewer', # grey scale color palette
     'cowplot', # arranging plots into a single plot
-    'forcats' # Rearranging variables to proper order
+    'forcats', # Rearranging variables to proper order
+    'writexl'  # write data to excel files
     
 )
 
