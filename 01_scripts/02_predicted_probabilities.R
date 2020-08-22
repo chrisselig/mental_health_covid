@@ -11,7 +11,10 @@ prediction_raw <- readxl::read_xlsx('00_data/Predicted values of mental health b
 # Tidy the data ----
 prediction_tidy <- prediction_raw %>% 
     # clean column names
-    janitor::clean_names() 
+    janitor::clean_names() %>% 
+    mutate(
+        economic_variable = factor(economic_variable, levels = c('Job security','Financial impact','Food security'))
+    )
 
 # Define plotting function ----
 pred_probability_function <- function(data = prediction_tidy,
@@ -26,14 +29,13 @@ pred_probability_function <- function(data = prediction_tidy,
         
         # filter(economic_variable == !!economic_variable) %>% 
         ggplot() +
-        # Geometries
-        # geom_errorbarh(aes(xmin = ci_low, xmax = ci_high, y = response),height=0.2, size=1, color="grey") +
         
+        # Geometries
         # Add horizontal line for low/high confidence interval
         geom_linerange(aes(xmin = ci_low, xmax = ci_high, y = response), size=1, color="grey") +
         
         # Add point for predicted probability
-        geom_point(aes(x=predicted_probability, y=response), size=2, color = 'black') +
+        geom_point(aes(x=predicted_probability, y=response), size=4, color = 'black') +
         
         # Trellis/show group by economic variable
         facet_wrap(~economic_variable, nrow = 3,strip.position = "right", scales='free_y') +
@@ -46,7 +48,8 @@ pred_probability_function <- function(data = prediction_tidy,
         # Change theme
         theme_minimal() +
         theme(
-            panel.grid = element_blank()
+            panel.grid = element_blank(),
+            text = element_text(size = 14)
         ) 
 }
 
@@ -59,12 +62,12 @@ pred_probability_function <- function(data = prediction_tidy,
 
 
 # Create final plot ----
-p1 <- pred_probability_function(data = data, metric = "Predicted 'bad' mental health", ylab = "Predicted 'bad' mental health")
-p2 <- pred_probability_function(data = data, metric = "Predicted elevated anxiety", ylab = "Predicted elevated anxiety")
+p1 <- pred_probability_function(data = prediction_tidy, metric = "Predicted 'bad' mental health", ylab = "Predicted 'bad' mental health")
+p2 <- pred_probability_function(data = prediction_tidy, metric = "Predicted elevated anxiety", ylab = "Predicted elevated anxiety")
 
 # combine plots
 combined_predictive_prob <- cowplot::plot_grid(p1,p2, 
                                            ncol = 1, nrow =2)
 
 # Save plot
-ggsave('02_images/predicted_prob_combined.png', combined_predictive_prob, dpi = 300, height=7, width = 8)
+ggsave('02_images/predicted_prob_combined.png', combined_predictive_prob, dpi = 300, height=8, width = 8)
