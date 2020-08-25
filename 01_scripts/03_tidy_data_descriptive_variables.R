@@ -27,6 +27,7 @@ tidy_data_descriptive <- raw_data %>%
                 'Not employed'
 )
 
+ # Reorders rows
 tidy_data_descriptive <- tidy_data_descriptive %>% 
     slice(match(response_order, response))
 

@@ -25,7 +25,7 @@ tidy_data_predictive <- raw_data_predicted %>%
         `CI (low)` = ...4,
         `CI (high)` = ...5
     ) %>% 
-    # Reorder columns
+    # Reorder all columns
     select(
         metric, everything()
     )
